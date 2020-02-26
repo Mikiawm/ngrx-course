@@ -9,6 +9,7 @@ import { Resort } from '@app/models/resort.model';
 import { State } from '@app/state';
 import { Store } from '@ngrx/store';
 import { NguiMapComponent } from '@ngui/map';
+import {Observable} from "rxjs";
 
 interface Marker {
   position: number[];
@@ -24,19 +25,18 @@ export class ResortsMapComponent implements OnChanges {
   @Input() height: number;
   @Input() resorts: Resort[];
   @Input() selectedResort: Resort;
+  @Input() zoom: number;
 
   bounds: google.maps.LatLngBounds;
   map: google.maps.Map;
   markers: Marker[] = [];
   @ViewChild(NguiMapComponent) nguiMapComponent: NguiMapComponent;
   title: string;
-  // todo: update zoom property to an input binding
-  zoom = 5;
-
-  // todo: inject the store singleton
-  constructor(private store: Store<State>) {}
 
   ngOnChanges(simpleChanges: SimpleChanges) {
+    if (this.map && simpleChanges.zoom && simpleChanges.zoom.currentValue) {
+      this.map.setZoom(this.zoom);
+    }
     if (simpleChanges.resorts && simpleChanges.resorts.currentValue) {
       this.markers = this.resorts.map(resort => ({
         position: [Number(resort.lat), Number(resort.lng)],
